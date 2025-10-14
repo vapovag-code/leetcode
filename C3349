@@ -1,0 +1,27 @@
+//3349. Adjacent Increasing Subarrays Detection I [easy]
+
+/*@ requires k is positive and nums points to an array of numsSize 
+    assigns nothing 
+    ensures solving the problem number 3349 
+only for loops with potential increase of the indices (no decrease) thus the program will terminate 
+O(nk) complexity because no optimisations */
+bool hasIncreasingSubarrays(int* nums, int numsSize, int k) {
+    for (int i = 0; i <= numsSize - k*2; i++){
+        bool flag = true;  
+        printf("%d\n", i);
+        for (int j = 0; j < k - 1; j++){ 
+            if (nums[i+j] >= nums[i+j+1]){ 
+                j = k-1; 
+                flag = false;
+            }
+        }
+        for (int l = k; l < 2*k - 1; l++){ 
+            if (nums[i+l] >= nums[i+l+1]){
+                l = 2*k - 1; 
+                flag = false;
+            }
+        }
+        if (flag) return true; 
+    }
+    return false;
+}
