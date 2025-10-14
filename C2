@@ -1,0 +1,27 @@
+2. Add Two Numbers [medium]
+
+struct ListNode* addTwoNumbers(struct ListNode* l1, struct ListNode* l2) {
+    int c = 0; 
+    int sum; 
+    struct ListNode* head = malloc(sizeof(struct ListNode)); 
+    head -> next = NULL;
+    struct ListNode* current = head; 
+    while (l1 || l2 || c > 0){ 
+        sum = c;
+        if (l1) { 
+            sum = sum + l1 -> val;
+            l1 = l1 -> next; 
+        } 
+        if (l2) { 
+            sum = sum + l2 -> val; 
+            l2 = l2 -> next; 
+        } 
+        c = sum / 10;  
+        struct ListNode* newnode = malloc(sizeof(struct ListNode)); 
+        newnode -> val = sum%10; 
+        newnode -> next = NULL; 
+        current -> next = newnode; 
+        current = current -> next; 
+    }
+    return head -> next; 
+}
