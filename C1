@@ -1,0 +1,124 @@
+//naïve approach with O(n²) complexity
+//the returnSize thing is confusing because we know it is going to be 2
+int* twoSum(int* nums, int numsSize, int target, int* returnSize) {
+    int* answer = malloc(2*sizeof(int));
+    *returnSize = 2;
+    for (int i = 0; i < numsSize; i++){
+        for (int j = i + 1; j < numsSize; j++){ 
+            if (nums[i] + nums[j] == target){ 
+                answer[0] = i; 
+                answer[1] = j; 
+                return answer;
+            }
+        }
+    }
+    return answer;
+}
+
+
+//the sorting approach is horrendeous in C because of the necessity to code the sort algorithm but also to define a type couple to have the value and the original index after the array has been sorted 
+//might as well just go for the best and final approach 
+
+//in C you actually have to define your own hash maps if you don't use advanced libraries (namely other libraries than the standard ones) 
+//the size of the hashmap definitly has a strong influence on the performance 
+//it is good exercise to try to code everything back from nothing and a lot of things can be improved and optimised
+
+#define SIZE 100
+
+typedef struct listnode ListNode; 
+struct listnode { 
+    int val;
+    int index; 
+    ListNode *next; 
+};
+
+ListNode** initialize (int size){ 
+    ListNode** h = malloc(size*sizeof(ListNode*));
+    for (int i = 0; i < size; i++){ 
+        h[i] = NULL;
+    }
+    return h;
+}
+
+/*int hashFunction(int value, int arrSize){
+    return value % arrSize; 
+}*/
+unsigned int hashFunction(unsigned int key, unsigned int N) {
+    key = ((key >> 16) ^ key) * 0x45d9f3b;
+    key = ((key >> 16) ^ key) * 0x45d9f3b;
+    key = (key >> 16) ^ key;
+    return key % N;
+}
+
+ListNode* addToLinkedList(ListNode* head, int v, int i){ 
+    ListNode* current = head;
+    ListNode* newnode = malloc(sizeof(ListNode)); 
+    newnode -> next = NULL; 
+    newnode -> val = v; 
+    newnode -> index = i;  
+    if (head == NULL) return newnode;
+    while (current -> next != NULL){ 
+        current = current -> next; 
+    }
+    current -> next = newnode;
+    return head;
+}
+
+void addToHashMap(ListNode** h, int size, int value, int index){
+    int f = hashFunction(value, size); 
+    h[f] = addToLinkedList(h[f], value, index); 
+    return;
+}
+
+int getIndexFromLinkedList(ListNode* head, int v, int i){ 
+    ListNode* current = head; 
+    while (current != NULL){
+        if (current -> val == v && current -> index != i){ 
+            return current -> index;
+        }
+        current = current -> next;
+    }
+    return -1;
+}
+
+int getIndexFromHashMap(ListNode** h, int size, int value, int index){ 
+    int f = hashFunction(value, size); 
+    return getIndexFromLinkedList(h[f], value, index);
+}
+
+void printLinkedList(ListNode* head){ 
+    ListNode* current = head; 
+    while (current != NULL){ 
+        printf("(%2d,%2d) - ", current -> val, current -> index); 
+        current = current -> next; 
+    }
+    printf("#\n");
+    return;
+}
+
+void printHashMap(ListNode** hashmap, int size){ 
+    for (int i = 0; i < size; i++){ 
+        printf("[%d] ", i);
+        printLinkedList(hashmap[i]);
+    }
+    return;
+}
+
+int* twoSum(int* nums, int numsSize, int target, int* returnSize) {
+    int potentialIndex; 
+    ListNode** hashmap = initialize(SIZE);
+    for (int a = 0; a < numsSize; a++){ 
+        addToHashMap(hashmap, SIZE, nums[a], a); 
+    }
+    printHashMap(hashmap, SIZE);
+    for (int b = 0; b < numsSize; b++){ 
+        potentialIndex = getIndexFromHashMap(hashmap, SIZE, target-nums[b], b);
+        if (potentialIndex >= 0){ 
+            nums[0] = b; 
+            nums[1] = potentialIndex; 
+            *returnSize = 2; 
+            return nums;
+        }
+    }
+    return nums; 
+}
