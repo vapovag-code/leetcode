@@ -1,0 +1,130 @@
+[COMMENTS]
+The naïve approach is great but definitly takes too much time when it comes to dealing with huge arrays of numbers. 
+But then I had an idea which was to reference the indices of the increasing segments within the array (which can be done in linear time). 
+Then it is possible to calculate the maximum two adjacent strictly-increasing segments. 
+Example: indices 0 - 4 - 6 - 7 - 10 - # ; lengths 4, 2, 1, 3 ; 
+Be careful! the answer is the maximum of this set {min(lengths[i], lengths[i+1])} U {lengths[i]/2} (in case you end up with 0 - 10 - # and 10, you can split into 5 and 5).
+I've used linked lists instead of dynamic arrays but both would work fine here. The former is probably faster and easier to implement once one gets used to it. 
+Took me an hour and a half if not more i believe. 
+
+typedef struct node { 
+    int value; 
+    struct node* next; 
+} node;
+
+// k >= 2
+int increasingSubarraysK(int* arr, int arrSize, int k) { 
+    bool flag;
+    for (int a = 0; a <= arrSize - k*2; a++){ 
+        flag = false;
+        for (int b = 0; b < k-1; b++){ 
+            if (arr[a+b] >= arr[a+b+1]){  
+                printf("[%d] jumping to %d bc %d >= %d\n", k, a+b+1, arr[a+b], arr[a+b+1]);
+                a = a+b+1;
+                b = k-1;
+                flag = true; 
+            }
+        }
+        if (!flag){ 
+            for (int c = k; c < 2*k-1; c++){ 
+                if (arr[a+c] >= arr[a+c+1]){ 
+                    c = 2*k-1; 
+                    flag = true;
+                }
+            }
+            if (!flag) return a;
+        }
+    }
+    return -1; 
+}
+
+void printList(node* head){ 
+    node* current = head; 
+    while (current != NULL){ 
+        printf("%d - ", current -> value);
+        current = current -> next;
+    }
+    printf("#\n");
+    return;
+}
+
+void printArray(int* arr, int arrSize){
+    printf("[ "); 
+    for (int i = 0; i < arrSize; i++){
+        printf("%d ", arr[i]); 
+    } 
+    printf("]\n");
+    return;
+}
+
+int listLength(node* head){ 
+    node* current = head; 
+    int c = 0;
+    while (current != NULL){ 
+        c++; 
+        current = current -> next; 
+    }
+    return c;
+}
+
+int _min(int a, int b){ 
+    if (a < b) return a; 
+    return b;
+}
+
+int maxOfArray(int* arr, int arrSize){ 
+    int M = 1, temp = 0; 
+    for (int j = 0; j < arrSize; j++){
+        temp = arr[j]/2; 
+        if (temp > M) M = temp;
+    }
+    for (int i = 0; i < arrSize - 1; i++){
+        temp = _min(arr[i], arr[i+1]);
+        if (temp > M) M = temp;
+    }
+    return M;
+}
+
+int answer(node* head){ 
+    int _len = listLength(head) - 1;
+    int lengths[_len];
+    int t1, t2;
+    node* current = head;
+    t2 = current -> value; 
+    for (int i = 0; i < _len; i++){
+        t1 = t2; 
+        current = current -> next; 
+        t2 = current -> value; 
+        lengths[i] = t2 - t1;
+    }
+    printArray(lengths, _len);
+    printf("ANSWER: %d\n", maxOfArray(lengths, _len));
+    return maxOfArray(lengths, _len);
+}
+
+
+node* increasingSubarrays(int* arr, int arrSize){ 
+    node* head = malloc(sizeof(node));
+    node* current = head; 
+    head -> next = NULL;
+    int L = 0, R = 0; 
+    while (L <= arrSize){
+        R++;
+        if (R >= arrSize || arr[R-1] >= arr[R]){  
+            node* newnode = malloc(sizeof(node)); 
+            newnode -> value = L; 
+            newnode -> next = NULL; 
+            current -> next = newnode; 
+            current = current -> next; 
+            L = R; 
+        }
+    }
+    return head -> next;
+}
+
+int maxIncreasingSubarrays(int* nums, int numsSize) {
+    node* head = increasingSubarrays(nums, numsSize);
+    printf("%d\n", listLength(head));
+    printList(head); 
+    return answer(head);
+}
