@@ -1,3 +1,5 @@
+3350. Adjacent Increasing Subarrays Detection II [medium]
+
 [COMMENTS]
 The naïve approach is great but definitly takes too much time when it comes to dealing with huge arrays of numbers. 
 But then I had an idea which was to reference the indices of the increasing segments within the array (which can be done in linear time). 
