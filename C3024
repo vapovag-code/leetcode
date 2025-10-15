@@ -1,0 +1,17 @@
+3024. Type of Triangle [easy]
+
+int mymax(int a, int b){ 
+    if (a > b) return a;
+    return b;
+}
+
+char* triangleType(int* nums, int numsSize) {
+    int M = mymax(nums[0], mymax(nums[1], nums[2]));
+    if (nums[0] + nums[1] + nums[2] - M <= M) return "none";
+    if (nums[0] == nums[1]){ 
+        if (nums[1] == nums[2]) return "equilateral";
+        return "isosceles";
+    }
+    if (nums[1] == nums[2] || nums[0] == nums[2]) return "isosceles"; 
+    return "scalene";
+}
