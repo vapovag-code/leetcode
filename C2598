@@ -1,0 +1,30 @@
+2598. Smallest Missing Non-negative Integer After Operations [medium]
+/* i had a functioning naïve approach but the complexity was obviously atrocious 
+i had to check the answer to understand the trick then it was easier and not that long to implement 
+i did it first in python then kinda translated the code to C */
+
+int findSmallestInteger(int* nums, int numsSize, int value) {
+    int remainders[value]; 
+    int temp;
+    int m; 
+    for (int a = 0; a < value; a++){ 
+        remainders[a] = 0;
+    }
+    for (int i = 0; i < numsSize; i++){ 
+        temp = nums[i] % value; 
+        if (temp < 0) temp += value;
+        //printf("%d ", temp);
+        remainders[temp] += 1;
+    }
+    //printf("\n");
+    m = remainders[0];
+    for (int j = 0; j < value; j++){ 
+        if (m > remainders[j]) m = remainders[j];
+        //printf("%d ", remainders[j]);
+    }
+    //printf("# %d\n", m);
+    for (int k = 0; k < value; k++){
+        if (m == remainders[k]) return m*value + k; 
+    }
+    return numsSize;
+}
